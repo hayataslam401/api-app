@@ -49,4 +49,4 @@ end
 gem 'jwt'
 # Use ActiveModel has_secure_password
 gem 'bcrypt', '~> 3.1.7'
-gem 'active_model_serializers', '~> 0.10.13'
+gem 'active_model_serializers'

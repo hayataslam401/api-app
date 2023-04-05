@@ -1,17 +1,16 @@
 class UsersController < ApplicationController
   before_action :authorize_request, except: :create
   before_action :find_user, except: %i[create index]
-
+  include JsonResponse
   # GET /users
   def index
     users = User.all
-   
-    render json: users, status: :ok
+    render json: users, each_serializer: UserSerializer, status: :ok
   end
 
   # GET /users/{username}
   def show
-    render json: @user, status: :ok
+    render json: @user,serializer: UserSerializer, status: :ok
   end
 
 
@@ -21,16 +20,14 @@ class UsersController < ApplicationController
     if @user.save
       render json: @user, status: :created
     else
-      render json: { errors: @user.errors.full_messages },
-             status: :unprocessable_entity
+      unprocessable_entity_response(@user)
     end
   end
 
   # PUT /users/{username}
   def update
     unless @user.update(user_params)
-      render json: { errors: @user.errors.full_messages },
-             status: :unprocessable_entity
+      unprocessable_entity_response(@user)
     end
     render json: @user
   end

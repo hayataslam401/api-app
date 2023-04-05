@@ -1,16 +1,12 @@
 class PostsController < ApplicationController
     before_action :authorize_request
     before_action :find_post, except: %i[create index]
+    include JsonResponse
   
     # GET /users
     def index
       posts = Post.all
-      data={
-        status: "login successfully",
-        lead:    "OK",
-        posts:    posts.map { |post| post.as_json.merge({ images: post.images.map{|img| ({ image: url_for(img) })} })}
-      }
-      render json: data, status: :ok
+      render json: posts, each_serializer: PostSerializer, status: :ok
     end
   
     # GET /users/{username}
@@ -24,16 +20,14 @@ class PostsController < ApplicationController
       if @post.save
         render json: @post, status: :created
       else
-        render json: { errors: @post.errors.full_messages },
-               status: :unprocessable_entity
+        unprocessable_entity_response(@post)
       end
     end
   
     # PUT /users/{username}
     def update
       unless @post.update(post_params)
-        render json: { errors: @post.errors.full_messages },
-               status: :unprocessable_entity
+        unprocessable_entity_response(@post)
       end
       render json: @post
     end
